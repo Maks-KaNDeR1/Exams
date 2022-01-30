@@ -1,45 +1,79 @@
-import React, { useState } from 'react'
-import Count from './Count'
-import Decrement from './Decrement'
-import Increment from './Increment'
+import React, { ChangeEvent, FormEvent, KeyboardEvent, useEffect, useState } from 'react';
+import Increment from './Buttons/Increment';
+import Reset from './Buttons/Reset';
+import Score from './Display/Score';
+import Setting from './Display/Setting';
+import s from './counter.module.css'
+import Button from './Buttons/Button';
+
+function Counter() {
+
+    let [value, setValue] = useState(0)
+    let [count, setCount] = useState(true)
+    let [maxValue, setMaxValue] = useState(5)
 
 
+    useEffect(() => {
+        getFromLocalStorage()
+    }, [])
 
-function Сounter() {
+    useEffect(() => {
+        setToLocalStorage()
+    }, [value])
 
-    let [counter, setCounter] = useState<number>(0)
-
-    const increment = () => {
-        setCounter(counter - 1)
+    const setToLocalStorage = () => {
+        localStorage.setItem('counterValueKey', JSON.stringify(value))
+    }
+    const getFromLocalStorage = () => {
+        let valueAString = localStorage.getItem('counterValueKey')
+        if (valueAString) {
+            let newValue = JSON.parse(valueAString)
+            setValue(newValue)
+        }
     }
 
-    const decrement = () => {
-        setCounter(counter + 1)
+  
+    const onClickHandler = () => {
+        if(count === true) {
+            setCount(false)
+        } else { 
+            setCount(true)
+        }
     }
+ 
 
-    return (
-        <div>
-            <div style={{ height: '100px', fontSize: '80px' }}>
-                <Count counter={counter} />
+    return <div>
+
+        <div className={s.display}>
+            {
+                count ? <Score value={value} maxValue={maxValue} />
+                    : <Setting 
+                    value={value}
+                    maxValue={maxValue} 
+                    setValue={setValue}
+                    setMaxValue={setMaxValue}
+                    />
+            }
+         </div>
+
+        <div className={s.buttons} >
+            <div className={s.button}>
+                <Increment value={value} setValue={setValue} maxValue={maxValue} />
+            </div >
+            <div className={s.button}>
+                <Reset value={value} setValue={setValue} />
             </div>
-            <div
-                className='buttons'>
-                <div style={{ padding: '27px', display: 'inline-block' }}>
-                    <Increment
-                        increment={increment}
-                        counter={counter} />
-                </div>
-                <div style={{ padding: '27px', display: 'inline-block' }}>
-                    <Decrement
-                        decrement={decrement}
-                        counter={counter} />
-                </div>
+            <div className={s.button}>
+                <Button 
+                // onKeyPressHandler={onKeyPressHandler}
+                 name='set' value={value}
+                  onClickHandler={onClickHandler}
+                />
             </div>
         </div>
-    )
+    </div >;
 }
 
+export default Counter
 
 
-
-export default Сounter
